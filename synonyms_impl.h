@@ -7,6 +7,8 @@
 #ifndef __SYNONYMS_IMPL_H__
 # define __SYNONYMS_IMPL_H__
 
+# include <stdbool.h>
+
 # define NULL_TERMINATED __attribute__((__sentinel__))
 
 typedef struct _Synonyms Synonyms;
@@ -18,9 +20,14 @@ void
 synonyms_free(Synonyms *s);
 
 int
-synonyms_append(Synonyms *s,
+synonyms_define(Synonyms *s,
                 const char *word, ...)
     NULL_TERMINATED;
+
+bool
+is_synonym(Synonyms *s,
+           const char *w1,
+           const char *w2);
 
 char **
 synonyms_get(Synonyms *s,

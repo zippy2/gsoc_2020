@@ -31,13 +31,22 @@ do { \
 } while (0)
 
 
-#define SYNONYMS_APPEND(s, word, ...) \
+#define SYNONYMS_DEFINE(s, word, ...) \
 do { \
-    if (synonyms_append(s, word, __VA_ARGS__) < 0) { \
-        ERROR("unable to add synonym for \"" word "\""); \
+    if (synonyms_define(s, word, __VA_ARGS__) < 0) { \
+        ERROR("Unable to define synonym for \"" word "\""); \
         goto cleanup; \
     } \
 } while (0)
+
+
+#define IS_SYNONYM(s, word1, word2, expect) \
+do { \
+    if (is_synonym(s, word1, word2) != expect) { \
+        ERROR("Unexpected is_synonym(\"" word1 "\", \"" word2 "\") retval"); \
+        goto cleanup; \
+    } \
+} while(0)
 
 
 #define SYNONYMS_CHECK(s, word, expect) \
@@ -105,10 +114,15 @@ int main(int argc, char *argv[])
         goto cleanup;
     }
 
-    SYNONYMS_APPEND(s, "synonym", "alternative", "equivalent", NULL);
-    SYNONYMS_APPEND(s, "virtual", "simulated", NULL);
-    SYNONYMS_APPEND(s, "student", "pupil", NULL);
-    SYNONYMS_APPEND(s, "pupil", "schoolchild", NULL);
+    SYNONYMS_DEFINE(s, "synonym", "alternative", "equivalent", NULL);
+    SYNONYMS_DEFINE(s, "virtual", "simulated", NULL);
+    SYNONYMS_DEFINE(s, "student", "pupil", NULL);
+    SYNONYMS_DEFINE(s, "pupil", "schoolchild", NULL);
+
+    IS_SYNONYM(s, "synonym", "alternative", true);
+    IS_SYNONYM(s, "alternative", "synonym", true);
+    IS_SYNONYM(s, "synonym", "virtual", false);
+    IS_SYNONYM(s, "virtual", "virtual", false);
 
     SYNONYMS_CHECK(s, "synonym", "alternative");
     SYNONYMS_CHECK(s, "equivalent", "synonym");
